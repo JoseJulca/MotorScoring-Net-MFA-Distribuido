@@ -1,0 +1,25 @@
+@model MotorScoring.Web.Models.Auth.LoginViewModel
+@{
+    ViewData["Title"] = "Iniciar sesión";
+}
+<section class="auth-shell">
+    <div class="card auth-card">
+        <h1>Iniciar sesión</h1>
+        <p>Acceda al Motor de Scoring con su cuenta local o un proveedor externo.</p>
+        @if (TempData["AuthError"] is string err) { <div class="alert alert-error">@err</div> }
+        <form method="post" asp-action="Login">
+            @Html.AntiForgeryToken()
+            <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+            <input asp-for="ReturnUrl" type="hidden" />
+            <div class="field"><label asp-for="Email"></label><input asp-for="Email" autocomplete="username" /><span asp-validation-for="Email"></span></div>
+            <div class="field"><label asp-for="Password"></label><input asp-for="Password" autocomplete="current-password" /><span asp-validation-for="Password"></span></div>
+            <button class="btn btn-primary auth-full" type="submit">Iniciar sesión</button>
+        </form>
+        <div class="auth-divider"><span>o continuar con</span></div>
+        <div class="external-grid">
+            <a class="btn btn-secondary" asp-action="ExternalLogin" asp-route-provider="Google">Google</a>
+            <a class="btn btn-secondary" asp-action="ExternalLogin" asp-route-provider="GitHub">GitHub</a>
+        </div>
+        <small>Usuario inicial Docker: admin@motorscoring.local</small>
+    </div>
+</section>

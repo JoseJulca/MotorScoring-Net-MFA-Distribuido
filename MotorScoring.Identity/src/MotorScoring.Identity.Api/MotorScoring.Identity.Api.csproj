@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
+    <AssemblyName>MotorScoring.Identity</AssemblyName>
+    <RootNamespace>MotorScoring.Identity</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\MotorScoring.Identity.Application\MotorScoring.Identity.Application.csproj" />
+    <ProjectReference Include="..\MotorScoring.Identity.Adapters.Inbound.Api\MotorScoring.Identity.Adapters.Inbound.Api.csproj" />
+    <ProjectReference Include="..\MotorScoring.Identity.Adapters.Outbound.Identity\MotorScoring.Identity.Adapters.Outbound.Identity.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+</Project>

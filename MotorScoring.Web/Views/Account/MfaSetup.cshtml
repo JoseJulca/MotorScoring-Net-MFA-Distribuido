@@ -1,0 +1,105 @@
+@model MotorScoring.Web.Models.Auth.MfaSetupViewModel
+@{ ViewData["Title"] = "Configurar MFA"; }
+
+<section class="page-heading">
+    <h1>Configurar MFA</h1>
+    <p>Configure una aplicación autenticadora TOTP para reforzar el inicio de sesión.</p>
+</section>
+
+<section class="card mfa-setup-card">
+@if (Model.Enabled)
+{
+    <div class="alert alert-success">
+        <strong>MFA activado correctamente.</strong>
+        <p>Guarde estos códigos de recuperación en un lugar seguro. Cada código se usa una sola vez.</p>
+        <div class="recovery-codes">
+            @foreach (var code in Model.RecoveryCodes)
+            {
+                <code>@code</code>
+            }
+        </div>
+    </div>
+    <div class="mfa-actions">
+        <a asp-controller="SolicitudesCredito" asp-action="Crear" class="btn btn-primary">Continuar</a>
+    </div>
+}
+else
+{
+    <form method="post" class="mfa-setup-form">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+
+        <section class="mfa-step">
+            <div class="mfa-step-number" aria-hidden="true">1</div>
+            <div class="mfa-step-content">
+                <h2>Escanee el código QR</h2>
+                <p class="mfa-step-description">Use una aplicación como Microsoft Authenticator, Google Authenticator o 1Password.</p>
+
+                <div class="mfa-qr-layout">
+                    <div class="mfa-qr-box">
+                        @if (!string.IsNullOrWhiteSpace(Model.QrCodeBase64))
+                        {
+                            <img class="mfa-qr-image"
+                                 src="data:image/png;base64,@Model.QrCodeBase64"
+                                 alt="Código QR para configurar MFA" />
+                        }
+                    </div>
+
+                    <div class="mfa-info-panel">
+                        <span class="mfa-info-icon" aria-hidden="true">i</span>
+                        <div>
+                            <strong>Instrucciones</strong>
+                            <ol>
+                                <li>Abra su aplicación autenticadora en su dispositivo móvil.</li>
+                                <li>Seleccione la opción para escanear un código QR.</li>
+                                <li>Escanee el código QR de la izquierda.</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div class="mfa-separator"></div>
+
+        <section class="mfa-step">
+            <div class="mfa-step-number" aria-hidden="true">2</div>
+            <div class="mfa-step-content">
+                <h2>Ingrese el código de verificación</h2>
+                <p class="mfa-step-description">Ingrese el código de 6 dígitos generado por su aplicación autenticadora.</p>
+                <div class="field mfa-code-field">
+                    <label asp-for="Code"></label>
+                    <input asp-for="Code" inputmode="numeric" autocomplete="one-time-code" placeholder="Ingrese el código de 6 dígitos" maxlength="8" />
+                    <span asp-validation-for="Code"></span>
+                </div>
+            </div>
+        </section>
+
+        <div class="mfa-separator"></div>
+
+        <section class="mfa-step">
+            <div class="mfa-step-number" aria-hidden="true">3</div>
+            <div class="mfa-step-content">
+                <h2>¿No puede escanear el código QR?</h2>
+                <p class="mfa-step-description">Puede ingresar la clave manualmente en su aplicación autenticadora.</p>
+
+                <details class="mfa-secret-details">
+                    <summary>Mostrar clave secreta</summary>
+                    <div class="mfa-secret-body">
+                        <code class="mfa-secret-key">@Model.SharedKey</code>
+                        <div class="mfa-warning">
+                            <span aria-hidden="true">⚠</span>
+                            <span>Esta clave es confidencial. Úsela solo si no puede escanear el código QR. No la comparta con otras personas.</span>
+                        </div>
+                    </div>
+                </details>
+            </div>
+        </section>
+
+        <div class="mfa-actions">
+            <button class="btn btn-primary" type="submit">Activar MFA</button>
+            <a asp-controller="SolicitudesCredito" asp-action="Crear" class="btn btn-secondary">Cancelar</a>
+        </div>
+    </form>
+}
+</section>

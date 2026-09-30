@@ -1,0 +1,79 @@
+@model EvaluacionScoringResponse
+@{
+    ViewData["Title"] = "Resultado de evaluación";
+    var tieneExcluyente = Model.Factores.Any(x => x.Excluyente);
+}
+
+<section class="page-heading">
+    <h1>Resultado de evaluación</h1>
+    <p>Detalle de la evaluación realizada a la solicitud.</p>
+</section>
+
+@if (TempData["RegistroExitoso"] is string mensaje)
+{
+    <div class="alert alert-success">@mensaje</div>
+}
+
+<section class="summary-card @(tieneExcluyente ? "summary-danger" : "summary-success")">
+    <div class="summary-item">
+        <span>Puntaje total</span>
+        <strong>@Model.PuntajeTotal</strong>
+        <small>de 0 a 1000 puntos</small>
+    </div>
+    <div class="summary-item">
+        <span>Resultado</span>
+        <strong class="summary-result">@Model.Resultado</strong>
+    </div>
+    <div class="summary-item">
+        <span>Estado</span>
+        <strong class="summary-text">@Model.Estado</strong>
+    </div>
+    <div class="summary-item">
+        <span>Versión modelo</span>
+        <strong class="summary-text">@Model.VersionModelo</strong>
+    </div>
+</section>
+
+<section class="date-card">
+    <span>Fecha de evaluación</span>
+    <strong>@Model.FechaEvaluacion.ToString("dd/MM/yyyy HH:mm:ss")</strong>
+</section>
+
+<section class="card factors-card">
+    <h2>Detalle por factor</h2>
+    <div class="table-scroll">
+        <table class="factors-table">
+            <thead>
+                <tr>
+                    <th>Factor</th>
+                    <th>Valor evaluado</th>
+                    <th>Peso aplicado</th>
+                    <th>Puntaje base</th>
+                    <th>Puntaje obtenido</th>
+                    <th>Regla aplicada</th>
+                    <th>Observación</th>
+                    <th>Excluyente</th>
+                </tr>
+            </thead>
+            <tbody>
+            @foreach (var factor in Model.Factores)
+            {
+                <tr class="@(factor.Excluyente ? "factor-excluyente" : null)">
+                    <td><strong>@factor.Factor</strong></td>
+                    <td>@factor.ValorEvaluado</td>
+                    <td>@factor.PesoAplicado.ToString("0.00")</td>
+                    <td>@factor.PuntajeBase</td>
+                    <td>@factor.PuntajeObtenido</td>
+                    <td>@factor.ReglaAplicada</td>
+                    <td>@factor.Observacion</td>
+                    <td>@(factor.Excluyente ? "Sí" : "No")</td>
+                </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+</section>
+
+<div class="result-actions">
+    <a asp-action="Crear" class="btn btn-secondary">Nueva solicitud</a>
+</div>

@@ -1,0 +1,604 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 1,
+  "id": null,
+  "links": [],
+  "liveNow": false,
+  "panels": [
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 10
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 0,
+        "y": 0
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "sum(container_last_seen{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"} > bool time() - 30)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Contenedores UP",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 1
+              }
+            ]
+          },
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 6,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "none",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "10 - sum(container_last_seen{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"} > bool time() - 30)",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "Contenedores DOWN",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          },
+          "unit": "percent",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 12,
+        "y": 0
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m])) * 100",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "CPU Total",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          },
+          "unit": "bytes",
+          "decimals": 2
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 4,
+        "w": 6,
+        "x": 18,
+        "y": 0
+      },
+      "id": 4,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "center",
+        "orientation": "auto",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "textMode": "value",
+        "wideLayout": true
+      },
+      "targets": [
+        {
+          "expr": "sum(container_memory_usage_bytes{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"})",
+          "instant": true,
+          "legendFormat": "",
+          "refId": "A"
+        }
+      ],
+      "title": "RAM Total",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "id": 5,
+      "title": "CPU POR CONTENEDOR",
+      "type": "barchart",
+      "gridPos": {
+        "h": 9,
+        "w": 24,
+        "x": 0,
+        "y": 4
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "fillOpacity": 80,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "lineWidth": 1
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "barRadius": 0,
+        "barWidth": 0.8,
+        "fullHighlight": false,
+        "groupWidth": 0.7,
+        "legend": {
+          "displayMode": "list",
+          "placement": "right",
+          "showLegend": true
+        },
+        "orientation": "horizontal",
+        "showValue": "always",
+        "stacking": "none",
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        },
+        "xTickLabelRotation": 0,
+        "xTickLabelSpacing": 0
+      },
+      "targets": [
+        {
+          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m])) * 100",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "id": 6,
+      "title": "MEMORIA POR CONTENEDOR",
+      "type": "table",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 13
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes",
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "sum by (name) (container_memory_usage_bytes{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"})",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Memoria",
+              "name": "Contenedor"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "id": 7,
+      "title": "RED / NETWORK",
+      "type": "timeseries",
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 13
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "Bps"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "table",
+          "placement": "right",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "multi",
+          "sort": "desc"
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum by (name) (rate(container_network_receive_bytes_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m]))",
+          "legendFormat": "RX {{name}}",
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (name) (rate(container_network_transmit_bytes_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m]))",
+          "legendFormat": "TX {{name}}",
+          "refId": "B"
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "id": 8,
+      "title": "ESTADO DE CONTENEDORES",
+      "type": "table",
+      "gridPos": {
+        "h": 12,
+        "w": 24,
+        "x": 0,
+        "y": 23
+      },
+      "fieldConfig": {
+        "defaults": {
+          "mappings": [
+            {
+              "options": {
+                "0": {
+                  "color": "red",
+                  "index": 0,
+                  "text": "🔴 DOWN"
+                },
+                "1": {
+                  "color": "green",
+                  "index": 1,
+                  "text": "🟢 UP"
+                }
+              },
+              "type": "value"
+            }
+          ],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "green",
+                "value": 1
+              }
+            ]
+          },
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "color-text"
+            },
+            "inspect": false
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "cellHeight": "sm",
+        "footer": {
+          "countRows": false,
+          "fields": "",
+          "reducer": [
+            "sum"
+          ],
+          "show": false
+        },
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-api\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-api\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "A"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-audit-worker\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-audit-worker\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "B"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-database\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-database\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "C"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-gateway\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-gateway\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "D"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-identity\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-identity\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "E"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-kafka\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-kafka\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "F"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-notificaciones-api\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-notificaciones-api\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "G"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-notification-worker\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-notification-worker\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "H"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-rabbitmq\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-rabbitmq\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "I"
+        },
+        {
+          "expr": "(max(container_last_seen{name=\"motor-scoring-web\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-web\", \"\", \"\"))",
+          "format": "table",
+          "instant": true,
+          "legendFormat": "{{name}}",
+          "refId": "J"
+        }
+      ],
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "Value": "Estado",
+              "name": "Contenedor"
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "refresh": "10s",
+  "schemaVersion": 39,
+  "tags": [
+    "motor-scoring",
+    "docker",
+    "cadvisor"
+  ],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "Motor Scoring - Infraestructura Docker",
+  "uid": "motor-scoring-infra",
+  "version": 3
+}

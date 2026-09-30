@@ -1,0 +1,8 @@
+@model MotorScoring.Web.Models.Auth.MfaViewModel
+@{ ViewData["Title"] = "Verificación MFA"; }
+<section class="auth-shell"><div class="card auth-card">
+<h1>Verificación en dos pasos</h1><p>Ingrese el código de 6 dígitos de Microsoft Authenticator, Google Authenticator u otra app TOTP compatible.</p>
+<form method="post">@Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+<input asp-for="ChallengeToken" type="hidden"/><input asp-for="ReturnUrl" type="hidden"/>
+<div class="field"><label asp-for="Code"></label><input asp-for="Code" inputmode="numeric" autocomplete="one-time-code"/><span asp-validation-for="Code"></span></div>
+<button class="btn btn-primary auth-full" type="submit">Verificar</button></form><p><a asp-action="RecoveryCode" asp-route-challengeToken="@Model.ChallengeToken" asp-route-returnUrl="@Model.ReturnUrl">Usar un código de recuperación</a></p></div></section>

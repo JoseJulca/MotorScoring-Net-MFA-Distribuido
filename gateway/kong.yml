@@ -1,0 +1,30 @@
+# Kong DB-less: routing without changing existing .NET controller paths.
+_format_version: "3.0"
+_transform: true
+services:
+  - name: identity-api
+    url: http://motor-scoring-identity:8082
+    routes:
+      - name: identity-auth
+        paths:
+          - /api/auth
+        strip_path: false
+        preserve_host: true
+      - name: identity-google-callback
+        paths:
+          - /signin-google
+        strip_path: false
+        preserve_host: true
+      - name: identity-github-callback
+        paths:
+          - /signin-github
+        strip_path: false
+        preserve_host: true
+  - name: scoring-api
+    url: http://motor-scoring-api:8080
+    routes:
+      - name: scoring-v1
+        paths:
+          - /api/v1
+        strip_path: false
+        preserve_host: true

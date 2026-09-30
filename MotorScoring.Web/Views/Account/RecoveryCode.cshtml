@@ -1,0 +1,8 @@
+@model MotorScoring.Web.Models.Auth.RecoveryCodeViewModel
+@{ ViewData["Title"] = "Código de recuperación"; }
+<section class="auth-shell"><div class="card auth-card">
+<h1>Código de recuperación</h1><p>Use uno de los códigos guardados al activar MFA. Cada código solo puede utilizarse una vez.</p>
+<form method="post">@Html.AntiForgeryToken()<div asp-validation-summary="ModelOnly" class="alert alert-error"></div>
+<input asp-for="ChallengeToken" type="hidden"/><input asp-for="ReturnUrl" type="hidden"/>
+<div class="field"><label asp-for="RecoveryCode"></label><input asp-for="RecoveryCode" autocomplete="one-time-code"/><span asp-validation-for="RecoveryCode"></span></div>
+<button class="btn btn-primary auth-full" type="submit">Validar código</button></form></div></section>

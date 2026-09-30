@@ -1,0 +1,184 @@
+# V2: Kong Gateway. Original preserved as docker-compose.yml.
+# Start: docker compose -f docker-compose.v2.yml up -d --build
+# Uses existing Docker service names, API routes and OAuth callback paths.
+services:
+  database:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: motor-scoring-database
+    environment:
+      ACCEPT_EULA: Y
+      MSSQL_SA_PASSWORD: Your_password123!
+    ports:
+    - 1433:1433
+    volumes:
+    - motor_scoring_sql:/var/opt/mssql
+    healthcheck:
+      test:
+      - CMD-SHELL
+      - /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P 'Your_password123!' -C
+        -Q 'SELECT 1' || exit 1
+      interval: 10s
+      timeout: 5s
+      retries: 20
+    restart: unless-stopped
+  motor-scoring-identity:
+    build:
+      context: ./MotorScoring.Identity
+      dockerfile: Dockerfile
+    container_name: motor-scoring-identity
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8082
+      ConnectionStrings__IdentityDb: Server=database,1433;Database=MotorScoringIdentity;User
+        Id=sa;Password=Your_password123!;TrustServerCertificate=True;Encrypt=False
+      Jwt__Issuer: MotorScoring.Identity
+      Jwt__Audience: MotorScoring.Api
+      Jwt__SigningKey: DEV-ONLY-MotorScoring-Signing-Key-Change-Me-2026-At-Least-32-Bytes
+      WebClient__BaseUrl: http://localhost:8081
+      Seed__AdminEmail: admin@motorscoring.local
+      Seed__AdminPassword: Admin1234*
+      Authentication__Google__ClientId: "${GOOGLE_CLIENT_ID}"
+      Authentication__Google__ClientSecret: "${GOOGLE_CLIENT_SECRET}"
+      Authentication__GitHub__ClientId: "${GITHUB_CLIENT_ID}"
+      Authentication__GitHub__ClientSecret: "${GITHUB_CLIENT_SECRET}"
+    ports:
+    - 8082:8082
+    depends_on:
+      database:
+        condition: service_healthy
+    restart: unless-stopped
+  motor-scoring-api:
+    build:
+      context: ./MotorScoring.Hexagonal.Net8
+      dockerfile: src/MotorScoring.Api/Dockerfile
+    container_name: motor-scoring-api
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+      ConnectionStrings__MotorScoringDb: Server=database,1433;Database=MotorScoring;User
+        Id=sa;Password=Your_password123!;TrustServerCertificate=True;Encrypt=False
+      Jwt__Issuer: MotorScoring.Identity
+      Jwt__Audience: MotorScoring.Api
+      Jwt__SigningKey: DEV-ONLY-MotorScoring-Signing-Key-Change-Me-2026-At-Least-32-Bytes
+      Notificaciones__BaseUrl: http://motor-scoring-notificaciones-api:8083/
+      Notificaciones__ApiKey: ${NOTIFICACIONES_API_KEY:-local-dev-notificaciones-key}
+    ports:
+    - 8080:8080
+    depends_on:
+      database:
+        condition: service_healthy
+      motor-scoring-notificaciones-api:
+        condition: service_started
+    restart: unless-stopped
+  motor-scoring-web:
+    build:
+      context: ./MotorScoring.Web
+      dockerfile: Dockerfile
+    container_name: motor-scoring-web
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8081
+      MotorScoringApi__BaseUrl: http://kong:8000
+      Identity__BaseUrl: http://kong:8000
+      Identity__PublicBaseUrl: http://localhost:8000
+    ports:
+    - 8081:8081
+    depends_on:
+    - kong
+    restart: unless-stopped
+  rabbitmq:
+    image: rabbitmq:3.13-management
+    container_name: motor-scoring-rabbitmq
+    environment:
+      RABBITMQ_DEFAULT_USER: scoring
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASSWORD:-scoring-local}
+    ports:
+    - 5672:5672
+    - 15672:15672
+    volumes:
+    - motor_scoring_rabbitmq:/var/lib/rabbitmq
+    restart: unless-stopped
+  kafka:
+    image: apache/kafka:3.8.1
+    container_name: motor-scoring-kafka
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: 'true'
+    volumes:
+    - motor_scoring_kafka:/var/lib/kafka/data
+    restart: unless-stopped
+  motor-scoring-notificaciones-api:
+    build:
+      context: .
+      dockerfile: MotorScoring.Notificaciones/src/MotorScoring.Notificaciones.Api/Dockerfile
+    container_name: motor-scoring-notificaciones-api
+    environment:
+      ASPNETCORE_URLS: http://+:8083
+      InternalApi__Key: ${NOTIFICACIONES_API_KEY:-local-dev-notificaciones-key}
+      RabbitMq__Host: rabbitmq
+      RabbitMq__User: scoring
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-scoring-local}
+      Kafka__BootstrapServers: kafka:9092
+    ports:
+    - 8083:8083
+    depends_on:
+    - rabbitmq
+    - kafka
+    restart: unless-stopped
+  motor-scoring-notification-worker:
+    build:
+      context: .
+      dockerfile: MotorScoring.Notification.Worker/Dockerfile
+    container_name: motor-scoring-notification-worker
+    environment:
+      RabbitMq__Host: rabbitmq
+      RabbitMq__User: scoring
+      RabbitMq__Password: ${RABBITMQ_PASSWORD:-scoring-local}
+    depends_on:
+    - rabbitmq
+    restart: unless-stopped
+  motor-scoring-audit-worker:
+    build:
+      context: .
+      dockerfile: MotorScoring.Audit.Worker/Dockerfile
+    container_name: motor-scoring-audit-worker
+    environment:
+      Kafka__BootstrapServers: kafka:9092
+      Audit__FilePath: /app/audit/auditoria-scoring.jsonl
+    volumes:
+    - motor_scoring_audit:/app/audit
+    depends_on:
+    - kafka
+    restart: unless-stopped
+  kong:
+    image: kong:3.9
+    container_name: motor-scoring-gateway
+    environment:
+      KONG_DATABASE: 'off'
+      KONG_DECLARATIVE_CONFIG: /kong/declarative/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+    volumes:
+    - ./gateway/kong.yml:/kong/declarative/kong.yml:ro
+    ports:
+    - 8000:8000
+    depends_on:
+      motor-scoring-identity:
+        condition: service_started
+      motor-scoring-api:
+        condition: service_started
+    restart: unless-stopped
+volumes:
+  motor_scoring_sql: null
+  motor_scoring_rabbitmq: null
+  motor_scoring_kafka: null
+  motor_scoring_audit: null

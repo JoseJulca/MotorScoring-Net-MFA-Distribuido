@@ -1,0 +1,181 @@
+@model MotorScoring.Web.Models.ViewModels.CrearSolicitudViewModel
+@{
+    ViewData["Title"] = "Registrar solicitud";
+    var registrada = Model.EstaRegistrada;
+}
+
+<section class="page-heading">
+    <h1>Registrar solicitud de crédito</h1>
+    <p>Complete la información del solicitante y los datos de la solicitud.</p>
+</section>
+
+@if (ViewData["RegistroExitoso"] is string registroExitoso)
+{
+    <div class="alert alert-success">
+        <strong>@registroExitoso</strong>
+        <div class="registration-status">
+            <span>Estado: @Model.Registro!.Estado</span>
+            <span>Identificador externo: @Model.Registro.IdentificadorExterno</span>
+        </div>
+        <p class="step-message">
+            Paso 1 completado. La solicitud ya fue registrada. Ahora puede ejecutar la evaluación.
+        </p>
+    </div>
+}
+
+<form method="post" id="frmSolicitud" class="card form-card" novalidate>
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="ModelOnly" class="alert alert-error validation-summary"></div>
+
+    @if (Model.Registro is not null)
+    {
+        <input type="hidden" asp-for="Registro.IdSolicitud" />
+        <input type="hidden" asp-for="Registro.IdSolicitante" />
+        <input type="hidden" asp-for="Registro.IdentificadorExterno" />
+        <input type="hidden" asp-for="Registro.CodigoProducto" />
+        <input type="hidden" asp-for="Registro.MontoSolicitado" />
+        <input type="hidden" asp-for="Registro.PlazoSolicitado" />
+        <input type="hidden" asp-for="Registro.Moneda" />
+        <input type="hidden" asp-for="Registro.Estado" />
+        <input type="hidden" asp-for="Registro.FechaRegistro" />
+    }
+
+    <section class="form-section">
+        <h2>Datos del solicitante</h2>
+        <div class="form-grid form-grid-3">
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.TipoDocumento"></label>
+                <select asp-for="Solicitud.Solicitante.TipoDocumento" disabled="@registrada">
+                    <option value="DNI">DNI</option>
+                    <option value="RUC">RUC</option>
+                    <option value="CE">CE</option>
+                    <option value="PASAPORTE">PASAPORTE</option>
+                </select>
+                <input type="hidden" asp-for="Solicitud.Solicitante.TipoDocumento" />
+                <span asp-validation-for="Solicitud.Solicitante.TipoDocumento"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.NumeroDocumento"></label>
+                <input asp-for="Solicitud.Solicitante.NumeroDocumento" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.NumeroDocumento"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.NombresRazonSocial"></label>
+                <input asp-for="Solicitud.Solicitante.NombresRazonSocial" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.NombresRazonSocial"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.IngresosMensuales"></label>
+                <input asp-for="Solicitud.Solicitante.IngresosMensuales" step="0.01" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.IngresosMensuales"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.GastosMensuales"></label>
+                <input asp-for="Solicitud.Solicitante.GastosMensuales" step="0.01" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.GastosMensuales"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.ObligacionesFinancieras"></label>
+                <input asp-for="Solicitud.Solicitante.ObligacionesFinancieras" step="0.01" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.ObligacionesFinancieras"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.AntiguedadLaboralNegocio"></label>
+                <input asp-for="Solicitud.Solicitante.AntiguedadLaboralNegocio" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.AntiguedadLaboralNegocio"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.NumeroObligacionesActivas"></label>
+                <input asp-for="Solicitud.Solicitante.NumeroObligacionesActivas" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.NumeroObligacionesActivas"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.PuntajeHistorialPagos"></label>
+                <input asp-for="Solicitud.Solicitante.PuntajeHistorialPagos" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.PuntajeHistorialPagos"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Solicitante.AlertasMora"></label>
+                <input asp-for="Solicitud.Solicitante.AlertasMora" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Solicitante.AlertasMora"></span>
+            </div>
+        </div>
+    </section>
+
+    <section class="form-section">
+        <h2>Datos de la solicitud</h2>
+        <div class="form-grid form-grid-3">
+            <div class="field">
+                <label asp-for="Solicitud.IdentificadorExterno"></label>
+                <input asp-for="Solicitud.IdentificadorExterno" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.IdentificadorExterno"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.CodigoProducto"></label>
+                <input asp-for="Solicitud.CodigoProducto" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.CodigoProducto"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.MontoSolicitado"></label>
+                <input asp-for="Solicitud.MontoSolicitado" step="0.01" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.MontoSolicitado"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.PlazoSolicitado"></label>
+                <input asp-for="Solicitud.PlazoSolicitado" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.PlazoSolicitado"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.Moneda"></label>
+                <input asp-for="Solicitud.Moneda" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.Moneda"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.FinalidadCredito"></label>
+                <input asp-for="Solicitud.FinalidadCredito" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.FinalidadCredito"></span>
+            </div>
+            <div class="field">
+                <label asp-for="Solicitud.CanalOrigen"></label>
+                <input asp-for="Solicitud.CanalOrigen" readonly="@registrada" />
+                <span asp-validation-for="Solicitud.CanalOrigen"></span>
+            </div>
+        </div>
+    </section>
+
+    <div class="form-actions two-step-actions">
+        @if (!registrada)
+        {
+            <button type="button" class="btn btn-secondary" id="btnLimpiar">Limpiar</button>
+            <button
+                type="submit"
+                class="btn btn-primary"
+                id="btnRegistrar"
+                asp-action="Crear">
+                1. Registrar solicitud
+            </button>
+
+            <button
+                type="button"
+                class="btn btn-success"
+                id="btnEvaluar"
+                disabled
+                title="Primero debe registrar la solicitud">
+                2. Evaluar solicitud
+            </button>
+        }
+        else
+        {
+            <a class="btn btn-secondary" asp-action="Crear">Nueva solicitud</a>
+
+            <button
+                type="submit"
+                class="btn btn-success"
+                id="btnEvaluar"
+                asp-action="Evaluar">
+                2. Evaluar solicitud
+            </button>
+        }
+    </div>
+</form>

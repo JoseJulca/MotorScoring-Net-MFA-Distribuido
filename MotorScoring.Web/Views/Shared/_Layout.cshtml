@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - Motor de Scoring Crediticio</title>
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+</head>
+<body>
+<header class="topbar"><div class="page-shell topbar-inner">
+    <a asp-controller="SolicitudesCredito" asp-action="Crear" class="brand"><span class="brand-mark">◔</span><span>Motor de Scoring Crediticio</span></a>
+    @if (User.Identity?.IsAuthenticated == true) {
+      <div class="topbar-actions"><a asp-controller="SolicitudesCredito" asp-action="Crear" class="nav-link active">Nueva solicitud</a>
+      <a asp-controller="Account" asp-action="MfaSetup" class="nav-link">MFA</a><span class="user-name">@User.Identity.Name</span>
+      <form asp-controller="Account" asp-action="Logout" method="post">@Html.AntiForgeryToken()<button type="submit" class="link-button">Cerrar sesión</button></form></div>
+    }
+</div></header>
+<main class="page-shell main-content">@RenderBody()</main>
+<footer class="footer"><div class="page-shell">Motor de Scoring Crediticio</div></footer>
+<script src="~/js/site.js" asp-append-version="true"></script>@await RenderSectionAsync("Scripts", required: false)
+</body></html>

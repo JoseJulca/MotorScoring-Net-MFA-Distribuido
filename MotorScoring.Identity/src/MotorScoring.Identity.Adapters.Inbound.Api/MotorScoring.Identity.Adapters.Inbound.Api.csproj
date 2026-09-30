@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>12</LangVersion>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+    <ProjectReference Include="..\MotorScoring.Identity.Domain\MotorScoring.Identity.Domain.csproj" />
+    <ProjectReference Include="..\MotorScoring.Identity.Application\MotorScoring.Identity.Application.csproj" />
+  </ItemGroup>
+</Project>
