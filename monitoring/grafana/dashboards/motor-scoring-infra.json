@@ -29,7 +29,7 @@
               },
               {
                 "color": "green",
-                "value": 10
+                "value": 1
               }
             ]
           },
@@ -61,7 +61,7 @@
       },
       "targets": [
         {
-          "expr": "sum(container_last_seen{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"} > bool time() - 30)",
+          "expr": "sum(container_last_seen{name=~\"${container:regex}\",name!=\"\"} > bool time() - 30)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -122,7 +122,7 @@
       },
       "targets": [
         {
-          "expr": "10 - sum(container_last_seen{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"} > bool time() - 30)",
+          "expr": "count(container_last_seen{name=~\"${container:regex}\",name!=\"\"}) - sum(container_last_seen{name=~\"${container:regex}\",name!=\"\"} > bool time() - 30)",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -188,7 +188,7 @@
       },
       "targets": [
         {
-          "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m])) * 100",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{name=~\"${container:regex}\",name!=\"\"}[1m])) * 100",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -246,7 +246,7 @@
       },
       "targets": [
         {
-          "expr": "sum(container_memory_usage_bytes{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"})",
+          "expr": "sum(container_memory_usage_bytes{name=~\"${container:regex}\",name!=\"\"})",
           "instant": true,
           "legendFormat": "",
           "refId": "A"
@@ -307,7 +307,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m])) * 100",
+          "expr": "sum by (name) (rate(container_cpu_usage_seconds_total{name=~\"${container:regex}\",name!=\"\"}[1m])) * 100",
           "instant": true,
           "legendFormat": "{{name}}",
           "refId": "A"
@@ -355,7 +355,7 @@
       },
       "targets": [
         {
-          "expr": "sum by (name) (container_memory_usage_bytes{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"})",
+          "expr": "sum by (name) (container_memory_usage_bytes{name=~\"${container:regex}\",name!=\"\"})",
           "format": "table",
           "instant": true,
           "legendFormat": "{{name}}",
@@ -411,12 +411,12 @@
       },
       "targets": [
         {
-          "expr": "sum by (name) (rate(container_network_receive_bytes_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m]))",
+          "expr": "sum by (name) (rate(container_network_receive_bytes_total{name=~\"${container:regex}\",name!=\"\"}[1m]))",
           "legendFormat": "RX {{name}}",
           "refId": "A"
         },
         {
-          "expr": "sum by (name) (rate(container_network_transmit_bytes_total{name=~\"motor-scoring-(api|audit-worker|database|gateway|identity|kafka|notificaciones-api|notification-worker|rabbitmq|web)\"}[1m]))",
+          "expr": "sum by (name) (rate(container_network_transmit_bytes_total{name=~\"${container:regex}\",name!=\"\"}[1m]))",
           "legendFormat": "TX {{name}}",
           "refId": "B"
         }
@@ -438,45 +438,58 @@
       },
       "fieldConfig": {
         "defaults": {
-          "mappings": [
-            {
-              "options": {
-                "0": {
-                  "color": "red",
-                  "index": 0,
-                  "text": "🔴 DOWN"
-                },
-                "1": {
-                  "color": "green",
-                  "index": 1,
-                  "text": "🟢 UP"
-                }
-              },
-              "type": "value"
-            }
-          ],
+          "custom": {
+            "align": "auto",
+            "cellOptions": {
+              "type": "auto"
+            },
+            "inspect": false
+          },
+          "mappings": [],
           "thresholds": {
             "mode": "absolute",
             "steps": [
               {
-                "color": "red",
-                "value": null
-              },
-              {
                 "color": "green",
-                "value": 1
+                "value": null
               }
             ]
-          },
-          "custom": {
-            "align": "auto",
-            "cellOptions": {
-              "type": "color-text"
-            },
-            "inspect": false
           }
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Estado"
+            },
+            "properties": [
+              {
+                "id": "mappings",
+                "value": [
+                  {
+                    "type": "value",
+                    "options": {
+                      "0": {
+                        "text": "🔴 DOWN",
+                        "color": "red"
+                      },
+                      "1": {
+                        "text": "🟢 UP",
+                        "color": "green"
+                      }
+                    }
+                  }
+                ]
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-text"
+                }
+              }
+            ]
+          }
+        ]
       },
       "options": {
         "cellHeight": "sm",
@@ -492,81 +505,14 @@
       },
       "targets": [
         {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-api\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-api\", \"\", \"\"))",
+          "expr": "max by (name) (container_last_seen{name=~\"${container:regex}\",name!=\"\"} > bool time() - 30)",
           "format": "table",
           "instant": true,
           "legendFormat": "{{name}}",
           "refId": "A"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-audit-worker\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-audit-worker\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "B"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-database\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-database\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "C"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-gateway\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-gateway\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "D"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-identity\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-identity\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "E"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-kafka\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-kafka\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "F"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-notificaciones-api\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-notificaciones-api\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "G"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-notification-worker\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-notification-worker\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "H"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-rabbitmq\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-rabbitmq\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "I"
-        },
-        {
-          "expr": "(max(container_last_seen{name=\"motor-scoring-web\"} > bool time() - 30) or label_replace(vector(0), \"name\", \"motor-scoring-web\", \"\", \"\"))",
-          "format": "table",
-          "instant": true,
-          "legendFormat": "{{name}}",
-          "refId": "J"
         }
       ],
       "transformations": [
-        {
-          "id": "merge",
-          "options": {}
-        },
         {
           "id": "organize",
           "options": {
@@ -574,8 +520,8 @@
               "Time": true
             },
             "renameByName": {
-              "Value": "Estado",
-              "name": "Contenedor"
+              "name": "Contenedor",
+              "Value": "Estado"
             }
           }
         }
@@ -590,7 +536,32 @@
     "cadvisor"
   ],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "name": "container",
+        "label": "Contenedor",
+        "type": "query",
+        "datasource": {
+          "type": "prometheus",
+          "uid": "prometheus"
+        },
+        "query": {
+          "query": "label_values(container_last_seen{name=~\"motor-scoring-.+\",name!=\"\"}, name)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "definition": "label_values(container_last_seen{name=~\"motor-scoring-.+\",name!=\"\"}, name)",
+        "includeAll": true,
+        "allValue": "motor-scoring-.+",
+        "multi": true,
+        "refresh": 1,
+        "sort": 1,
+        "current": {
+          "selected": true,
+          "text": "All",
+          "value": "$__all"
+        }
+      }
+    ]
   },
   "time": {
     "from": "now-30m",
@@ -600,5 +571,5 @@
   "timezone": "browser",
   "title": "Motor Scoring - Infraestructura Docker",
   "uid": "motor-scoring-infra",
-  "version": 3
+  "version": 5
 }

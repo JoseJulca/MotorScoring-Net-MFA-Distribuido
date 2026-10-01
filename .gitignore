@@ -44,6 +44,11 @@ obj/x86/
 bld/
 [Oo]bj/
 [Oo]ut/
+
+# No ignorar los puertos de salida de arquitectura hexagonal
+!**/Ports/Out/
+!**/Ports/Out/**
+
 [Ll]og/
 [Ll]ogs/
 
