@@ -10,7 +10,7 @@ services:
       ACCEPT_EULA: Y
       MSSQL_SA_PASSWORD: Your_password123!
     ports:
-    - 1433:1433
+    - 14330:1433
     volumes:
     - motor_scoring_sql:/var/opt/mssql
     healthcheck:
